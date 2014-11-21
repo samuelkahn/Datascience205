@@ -1,6 +1,6 @@
 Datascience205 --- Information Retrieval
 ==============
-Coursework for information retrieval including parts of the Final Project
+Coursework for information retrieval including parts of the Final Project\n
 
 HW1 --- Process XML Data
 HW2 --- SQL Queries
