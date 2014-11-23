@@ -1,7 +1,5 @@
 # -*- coding: utf-8 -*-
 """
-Created on Thu Nov 20 13:48:05 2014
-
 @author: samuelkahn
 """
 
@@ -11,8 +9,7 @@ from mrjob.job import MRJob
 class AverageIncomeFIPSCode(MRJob):
 
     def mapper(self, line_no, line):
-        cells = line.split(',')
-        
+        cells = line.split(',')        
         fips=cells[0]
         wage=cells[len(cells)-1]
         try:
