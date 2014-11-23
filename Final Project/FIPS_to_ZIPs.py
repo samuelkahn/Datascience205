@@ -1,6 +1,6 @@
 # requires "pip install request"
-# (or if you are a noob and have your environment totally ****ed
-#	"sudo pip install request")
+# (or "sudo pip install request")
+
 import json
 import request
 
@@ -52,7 +52,7 @@ def _post_data(year, zip_code, income):
 
 def _get_files_to_upload():
 	to_look_at = []
-	
+
 	list_of_years = range(1990, 2015)
 	for year in list_of_years:
 		to_look_at.append('{}/{}_output.txt'.format(year, year))
@@ -81,4 +81,5 @@ def _parse_and_upload_files(file_list, fips_to_zips):
 if __name__ == '__main__':
 	fips_to_zips = _build_up_fips_to_zips_dict()
 	files = _get_files_to_upload()
+	_parse_and_upload_files(files, fips_to_zips)
 
