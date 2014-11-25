@@ -1,7 +1,7 @@
 #!/bin/bash
-for i in {2010..2014}
+for i in {1990..2014}
   do
      folder=$i".q1-q4.by_industry"
-     mkdir $i
-     python Average_Income_MapReduce.py -c mrjob.conf -r emr --emr-job-flow-id=j-3595L8HT3BGN5  s3://samuelkahn/BLS/$folder/*csv > $i/$i"_output.txt" 
+ #    mkdir $i
+     python Yearly_Emloyment_Level_Mapreduce.py -c mrjob.conf -r emr --emr-job-flow-id=j-3JG6A8B8ZAYU6  s3://samuelkahn/BLS/$folder/*csv > $i/$i"_employment_level.txt"     
  done
