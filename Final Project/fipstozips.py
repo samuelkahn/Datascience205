@@ -1,3 +1,5 @@
+#Uses the CDC zipcty files found here http://wonder.cdc.gov/wonder/sci_data/codes/fips/type_txt/cntyxref.asp
+
 import json
 import csv
 
