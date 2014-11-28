@@ -12,6 +12,7 @@ class AverageIncomeFIPSCode(MRJob):
         cells = line.split(',')        
         fips=cells[0]
         wage=cells[len(cells)-1]
+        ### Yield fips as key, average quarterly weekly wage
         try:
             yield fips,float(wage)
         except ValueError:
@@ -22,13 +23,14 @@ class AverageIncomeFIPSCode(MRJob):
         fips_code=str(fips_code)
         count=0
         num=0
+        ### Sum  quarterly weekly wages and divide to get average quarterly wages
         while True:
             try:
                 count+=wages_gen.next()
                 num+=1
             except StopIteration:
                 break
-        fips_code.replace('"','')
+        ### Yield fips code and average
         yield fips_code[1:-1],count/num
 
         
