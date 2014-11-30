@@ -31,7 +31,15 @@ d3.json("output.json", function(error, topology) {
   svg.selectAll("path")
       .data(topojson.feature(topology, topology.objects.counties).features)
     .enter().append("path")
-      .attr("d", path);
+      .attr("d", path)
+    .append("svg:title")
+    .text(function(d) {
+       if(d.properties) {
+           return d.properties.name;
+       } else {
+           return 'NA';
+       }
+    });
 });
 
 </script>
