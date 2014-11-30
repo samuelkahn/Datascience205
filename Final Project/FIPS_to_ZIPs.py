@@ -43,6 +43,19 @@ def _get_fip_to_zip():
             fip_to_zip[fip].append(key)
 
     return fip_to_zip
+
+def _get_fips_to_county():
+    fips_to_county = {}
+    with open('area_titles.csv') as raw:
+        reader = csv.reader(raw)
+        # get rid of the five header rows
+        for i in range(5):
+            next = reader.next()
+        for row in reader:
+            fips_to_county[row[0]] = row[1]
+    print len(fips_to_county)
+    return fips_to_county
+
     
 def _post_data(year, zip_code, income):
     if DEBUG:
@@ -91,6 +104,9 @@ def _open_and_upload_file(filename, fips_to_zips):
                 hit += 1
                 row[0] = ",".join(zips)
                 writer.writerow(row)
+        print len(missed)
+        print missed
+        print hit
 
 
 def _parse_and_upload_files(file_list, fips_to_zips):
@@ -99,7 +115,8 @@ def _parse_and_upload_files(file_list, fips_to_zips):
 
 
 if __name__ == '__main__':
-    fips_to_zips = _get_fip_to_zip()
+    #fips_to_zips = _get_fip_to_zip()
+    fips_to_county = _get_fips_to_county()
     files = _get_files_to_upload()
-    _parse_and_upload_files(files, fips_to_zips)
+    _parse_and_upload_files(files, fips_to_county)
 
