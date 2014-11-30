@@ -1,0 +1,55 @@
+13, AfghanistanHistory
+14, AfghanistanGeography
+15, AfghanistanPeople
+18, AfghanistanCommunications
+19, AfghanistanTransportations
+20, AfghanistanMilitary
+21, AfghanistanTransnationalIssues
+276, AmericanFootball
+615, American Football Conference
+651, America the Beautiful
+659, American National Standards Institute
+737, Afghanistan
+771, American Revolutionary War
+813, Afghanistan/History
+814, Afghanistan/Geography
+815, Afghanistan/Government
+816, Afghanistan/People
+817, Afghanistan/Economy
+818, Afghanistan/Communications
+820, Afghanistan/Military
+821, Afghanistan/Transnational Issues
+822, Afghanistan (1911 Encyclopedia)
+863, American Civil War
+869, American Film Institute
+966, American shot
+1116, American Samoa/Military
+1136, America's National Game
+1201, American Sign Language
+1241, American (word)
+1338, Americans with Disabilities Act of 1990
+1339, Americans with Disabilities Act of 1990/Findings and Purposes
+1340, Americans with Disabilities Act of 1990/Definitions
+1341, Americans with Disabilities Act of 1990/Title III
+1558, American Chinese cuisine
+1833, American bias
+1890, American English
+1902, American Airlines Flight 77
+1903, American Airlines flight 77
+1904, American Airlines flight 11
+1950, American Civil Liberties Union
+1973, American Revolution
+2211, American Folklore
+2299, American Media (publisher)
+2357, American Football League
+2386, American Airlines
+2472, American Quarter Horse
+2561, American political scandals
+2647, American indian
+2659, American war of independence
+2799, American Registry for Internet Numbers
+2863, American Telephone and Telegraph Company
+2977, American sign language
+3260, America Islands
+3861, American League Championship Series
+3862, American League Division Series
