@@ -4,6 +4,8 @@ Summarize data will read the data out of the zip files and combine it on FIPS
 
 import csv
 
+from utils import peek_print_dict
+
 WEEKLY_WAGE = 'weekly_wage'
 TOTAL_WAGES = 'total_wages'
 ESTABLISHMENT_COUNT = 'establishment_count'
@@ -14,7 +16,9 @@ FIELDS = [WEEKLY_WAGE, TOTAL_WAGES, ESTABLISHMENT_COUNT, EMPLOYMENT_LEVEL]
 def summarize_data():
     summary = _build_summarize_data()
     _combine_names(summary)
-    _peek_print_dict(summary)
+    # looks at the first 10 entries
+    #peek_print_dict(summary)
+    return summary
 
 
 def _build_summarize_data():
@@ -39,23 +43,26 @@ def _build_summarize_data():
                     for idx, val in enumerate(FIELDS):
                         summary[key][val].append(value[idx])
                 else:
+                    # print 'miss on {}'.format(key)
                     miss += 1
-            print '{}/{}'.format(miss, hit)
+            print 'our miss hit for adding data from year {} is {}/{}'.format(year, miss, hit)
     return summary
 
 
 def _combine_names(summary_data):
     fip_to_name = _get_fips_to_county_name()
+    hit = 0
+    miss = 0
     for key, val in fip_to_name.items():
         if summary_data.get(key):
+            hit += 1
             summary_data[key]['name'] = val
         else:
-            print 'did not find county {} {}'.format(key, val)
+            #print 'did not find county {} {}'.format(key, val)
+            miss += 1
+    print 'our miss/hit count for matching names is {}/{}'.format(miss, hit)
 
 
-def _peek_print_dict(d):
-    for key in d.keys()[:10]:
-        print '{}: {}'.format(key, d.get(key))
 
 
 def _get_file_names():
