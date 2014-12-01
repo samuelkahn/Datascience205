@@ -5,3 +5,8 @@
 *.DS_Store*
 *node_modules*
 *.idea*
+<<<<<<< HEAD
+=======
+*.pyc
+*test.csv*
+>>>>>>> 9b11883b27887644dfbc46550677e4cced6a123e
