@@ -20,7 +20,7 @@
 
 var changer = {
     'Weekly Wage': 'weekly_wage',
-    'Employment Levels': 'employment_levels',
+    'Employment Levels': 'employment_level',
     'Establishment Count': 'establishment_count',
     'Total Wage': 'total_wages',
     'Population': 'population'
@@ -29,6 +29,8 @@ var changer = {
 // value is in [0,1]
 function map_normalized_variable_to_color(value) {
     // todo: make this better
+    var red = Math.round(255 * value);
+    return '#' + red.toString(16) + red.toString(16) + red.toString(16);
     if (value < .33) {
         return '#FF0000';
     }
@@ -42,9 +44,21 @@ function map_normalized_variable_to_color(value) {
 window.onload = function() {
     var maps = new Maps();
     var gui = new dat.GUI();
-    gui.add(maps, 'year', 1990, 2014);
-    gui.add(maps, 'normalize');
-    gui.add(maps, 'variable', ['Weekly Wage', 'Employment Levels', 'Establishment Count', 'Total Wage', 'Population']);
+    var yearChangeController = gui.add(maps, 'year', 1990, 2014).step(1);
+    yearChangeController.onFinishChange(function(val) {
+        console.log(val);
+        maps.render();
+    });
+    var normalizeController = gui.add(maps, 'normalize');
+    normalizeController.onFinishChange(function(val) {
+        console.log(val);
+        maps.render();
+    });
+    var varChangeController = gui.add(maps, 'variable', ['Weekly Wage', 'Employment Levels', 'Establishment Count', 'Total Wage', 'Population']);
+    varChangeController.onFinishChange(function(val) {
+        console.log(val);
+        maps.render();
+    });
 };
 
 var Maps = function() {
@@ -53,46 +67,54 @@ var Maps = function() {
     this.year = 1990;
     this.variable = 'Weekly Wage';
     this.normalize = false;
-    var var_name = changer[this.variable];
-    var year_index = this.year - 1990;
+
     var path = d3.geo.path();
-    var svg = d3.select("body").append("svg")
-            .attr("width", this.width)
-            .attr("height", this.height);
+    this.render = function render() {
+        d3.select("svg").remove();
+        var svg = d3.select("body").append("svg")
+                .attr("width", this.width)
+                .attr("height", this.height);
 
-    d3.json("output.json", function(error, topology) {
-        var counties = topology.objects.counties.geometries;
-        counties.forEach(function(c) {
-            if (c.properties) {
-                c.properties[var_name][year_index] = +c.properties[var_name][year_index];
-            }
-        });
-        var max = d3.max(counties, function(c) {if (c.properties) {return c.properties[var_name][year_index]} return 0;});
-        console.log(max);
-
-        svg.selectAll("path")
-            .data(topojson.feature(topology, topology.objects.counties).features)
-            .enter().append("path")
-            .attr("d", path)
-            .attr("fill", function(d) {
-                if(d.properties && d.properties[var_name]) {
-                    //console.log(d.properties.weekly_wage);
-                    var normal = d.properties[var_name][year_index] / max;
-                    return map_normalized_variable_to_color(normal);
-                } else {
-                    return '#000000';
-                }
-            })
-            .append("svg:title")
-            .text(function(d) {
-                if(d.properties) {
-                    return d.properties.name;
-                } else {
-                    return 'NA';
+        var var_name = changer[this.variable];
+        var year_index = this.year - 1990;
+        d3.json("output.json", function(error, topology) {
+            var counties = topology.objects.counties.geometries;
+            counties.forEach(function(c) {
+                if (c.properties && c.properties[var_name]) {
+                    c.properties[var_name][year_index] = +c.properties[var_name][year_index];
                 }
             });
-    });
+            var max = d3.max(counties, function(c) {if (c.properties && c.properties[var_name]) {return c.properties[var_name][year_index]} return 0;});
+            console.log(max);
 
+            svg.selectAll("path")
+                .data(topojson.feature(topology, topology.objects.counties).features)
+                .enter().append("path")
+                .attr("d", path)
+                .attr("fill", function(d) {
+                    if(d.properties && d.properties[var_name]) {
+                        //console.log(d.properties.weekly_wage);
+                        var normal = d.properties[var_name][year_index] / max;
+                        return map_normalized_variable_to_color(normal);
+                    } else {
+                        return '#000000';
+                    }
+                })
+                .append("svg:title")
+                .text(function(d) {
+                    if(d.properties && d.properties[var_name]) {
+                        var level = Math.round(d.properties[var_name][year_index]);
+                        return d.properties.name + ': ' + level;
+                    }
+                    else if(d.properties) {
+                        return d.properties.name;
+                    } else {
+                        return 'NA';
+                    }
+                });
+        });
+    };
+    this.render();
 }
 
 
