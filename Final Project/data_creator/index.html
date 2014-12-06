@@ -2,44 +2,98 @@
 <meta charset="utf-8">
 <style>
 
-path {
-  fill: #ccc;
-  stroke: #fff;
-  stroke-width: .5px;
-}
+    path {
+      stroke: #fff;
+      stroke-width: .5px;
+    }
 
-path:hover {
-  fill: red;
-}
+    path:hover {
+      fill: red;
+    }
 
 </style>
 <body>
-<script src="http://d3js.org/d3.v3.min.js"></script>
-<script src="http://d3js.org/topojson.v1.min.js"></script>
+    <script src="http://d3js.org/d3.v3.min.js"></script>
+    <script src="http://d3js.org/topojson.v1.min.js"></script>
+    <script type="text/javascript" src="dat.gui.js"></script>
 <script>
 
-var width = 960,
-    height = 500;
+var changer = {
+    'Weekly Wage': 'weekly_wage',
+    'Employment Levels': 'employment_levels',
+    'Establishment Count': 'establishment_count',
+    'Total Wage': 'total_wages',
+    'Population': 'population'
+};
 
-var path = d3.geo.path();
+// value is in [0,1]
+function map_normalized_variable_to_color(value) {
+    // todo: make this better
+    if (value < .33) {
+        return '#FF0000';
+    }
+    else if (value < .67) {
+        return '#00FF00';
+    } else {
+        return '#0000FF';
+    }
+}
 
-var svg = d3.select("body").append("svg")
-    .attr("width", width)
-    .attr("height", height);
+window.onload = function() {
+    var maps = new Maps();
+    var gui = new dat.GUI();
+    gui.add(maps, 'year', 1990, 2014);
+    gui.add(maps, 'normalize');
+    gui.add(maps, 'variable', ['Weekly Wage', 'Employment Levels', 'Establishment Count', 'Total Wage', 'Population']);
+};
 
-d3.json("output.json", function(error, topology) {
-  svg.selectAll("path")
-      .data(topojson.feature(topology, topology.objects.counties).features)
-    .enter().append("path")
-      .attr("d", path)
-    .append("svg:title")
-    .text(function(d) {
-       if(d.properties) {
-           return d.properties.name;
-       } else {
-           return 'NA';
-       }
+var Maps = function() {
+    this.width = 960;
+    this.height = 500;
+    this.year = 1990;
+    this.variable = 'Weekly Wage';
+    this.normalize = false;
+    var var_name = changer[this.variable];
+    var year_index = this.year - 1990;
+    var path = d3.geo.path();
+    var svg = d3.select("body").append("svg")
+            .attr("width", this.width)
+            .attr("height", this.height);
+
+    d3.json("output.json", function(error, topology) {
+        var counties = topology.objects.counties.geometries;
+        counties.forEach(function(c) {
+            if (c.properties) {
+                c.properties[var_name][year_index] = +c.properties[var_name][year_index];
+            }
+        });
+        var max = d3.max(counties, function(c) {if (c.properties) {return c.properties[var_name][year_index]} return 0;});
+        console.log(max);
+
+        svg.selectAll("path")
+            .data(topojson.feature(topology, topology.objects.counties).features)
+            .enter().append("path")
+            .attr("d", path)
+            .attr("fill", function(d) {
+                if(d.properties && d.properties[var_name]) {
+                    //console.log(d.properties.weekly_wage);
+                    var normal = d.properties[var_name][year_index] / max;
+                    return map_normalized_variable_to_color(normal);
+                } else {
+                    return '#000000';
+                }
+            })
+            .append("svg:title")
+            .text(function(d) {
+                if(d.properties) {
+                    return d.properties.name;
+                } else {
+                    return 'NA';
+                }
+            });
     });
-});
+
+}
+
 
 </script>
