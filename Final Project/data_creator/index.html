@@ -32,7 +32,7 @@ function map_normalized_variable_to_color(value) {
     console.log(value);
     var blue = Math.round(Math.max(0, 255 - 2 * value * 255));
     var red = Math.round(Math.max(0, -255 + 2 * value * 255));
-    var green = Math.round((255 - blue - red) * .67);
+    var green = Math.round((255 - blue - red) * .5);
     console.log(red);
     var redStr = red.toString(16);
     if (redStr.length == 1) {
@@ -42,7 +42,7 @@ function map_normalized_variable_to_color(value) {
     if (greenStr.length == 1) {
         greenStr = '0' + greenStr;
     }
-    var blueStr = blue.toString(16);
+    var blueStr = Math.round(blue * .75).toString(16);
     if (blueStr.length == 1) {
         blueStr = '0' + blueStr;
     }
@@ -107,7 +107,7 @@ var Maps = function() {
                         var normal = d.properties[var_name][year_index] / max;
                         return map_normalized_variable_to_color(normal);
                     } else {
-                        return '#000000';
+                        return '#FFFFFF';
                     }
                 })
                 .append("svg:title")
