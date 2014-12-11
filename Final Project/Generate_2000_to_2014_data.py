@@ -25,7 +25,6 @@ def txt_to_csv(filename):
                 ### Add rows to dataframe, column 3 is sum of all populations
                 df.loc[index]=[int(one_row[0]),one_row[1],sum(one_row[2:-1])]
                 index+=1
-                print index
             ### Catches header
             except ValueError:
                 continue
@@ -42,30 +41,33 @@ def run_regressions(filename):
     
     fips_list= list(set(df['fips'].tolist()))
     complete_dataframe=pd.DataFrame(columns=('year', 'fips', 'population'))
-    ### 
+    ### Index to know where you are in loop and to add values to dataframe
     index=0
     df_index=len(df)
+    ### years of prediction    
     prediction_years=np.array(range(2000,2015)).reshape(15,1)
-    
+    ### Loop over all FIPS
     for code in fips_list:
         print 'Fitting regression: '+str(index)+'/'+str(len(fips_list))
+        ### Subset dataframe by fips each iteration
         fips_df=df[df['fips']==code]
         ## Dependent and Independent variables        
         Y=np.array(fips_df['population'].tolist()).reshape(10,1)
         X=np.array(fips_df['year'].tolist()).reshape(10,1)
-        ### Fit and 
+        ### Fit and predict population on years 2000-2014
         reg_fit = linear_model.LinearRegression().fit(X,Y)
         fitted_results=reg_fit.predict(prediction_years).tolist()
-        
+        ### Add prediction results to dataframe
         for x in range(0,len(fitted_results)):
             df.loc[df_index]=[prediction_years[x][0],code,fitted_results[x][0]]
             df_index+=1
         index+=1
-        
+        #### Append values to new complete dataframe so it looks prettier when we write to csv
         complete_dataframe=complete_dataframe.append(df[df['fips']==code])
     complete_dataframe.to_csv('1990_2014_population.csv',sep=',',index=False)
         
 def main():
+    ### Change to path to your files
     path='/Users/samuelkahn/Desktop/Berkeley/DS205/Final Project'
     os.chdir(path)
     ### Convert BLS provided txt file to csv for easier processing

@@ -8,7 +8,7 @@
     }
 
     path:hover {
-      fill: red;
+      fill: yellow;
     }
 
 </style>
@@ -30,14 +30,28 @@ var changer = {
 function map_normalized_variable_to_color(value) {
     // todo: make this better
     var red = Math.round(255 * value);
-    return '#' + red.toString(16) + red.toString(16) + red.toString(16);
-    if (value < .33) {
-        return '#FF0000';
+//    return '#' + red.toString(16) + red.toString(16) + red.toString(16);
+    if (value < .01) {
+        return '#E5000E';
     }
-    else if (value < .67) {
-        return '#00FF00';
+    else if (value < .1) {
+        return '#E10052';
+    }else if (value < .3) {
+        return '#DD0093';
+    }else if (value < .4) {
+        return '#D900D2';
+    }else if (value < .5) {
+        return '#9C00D5';
+    }else if (value < .6) {
+        return '#5A00D2';
+    }else if (value < .7) {
+        return '#1B00CE';
+    }else if (value < .8) {
+        return '#0021CA';
+    }else if (value < .9) {
+        return '#005CC6';
     } else {
-        return '#0000FF';
+        return '#0095C2';
     }
 }
 
