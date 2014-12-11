@@ -29,30 +29,26 @@ var changer = {
 // value is in [0,1]
 function map_normalized_variable_to_color(value) {
     // todo: make this better
-    var red = Math.round(255 * value);
-//    return '#' + red.toString(16) + red.toString(16) + red.toString(16);
-    if (value < .01) {
-        return '#E5000E';
+    console.log(value);
+    var blue = Math.round(Math.max(0, 255 - 2 * value * 255));
+    var red = Math.round(Math.max(0, -255 + 2 * value * 255));
+    var green = Math.round((255 - blue - red) * .67);
+    console.log(red);
+    var redStr = red.toString(16);
+    if (redStr.length == 1) {
+        redStr = '0' + redStr;
     }
-    else if (value < .1) {
-        return '#E10052';
-    }else if (value < .3) {
-        return '#DD0093';
-    }else if (value < .4) {
-        return '#D900D2';
-    }else if (value < .5) {
-        return '#9C00D5';
-    }else if (value < .6) {
-        return '#5A00D2';
-    }else if (value < .7) {
-        return '#1B00CE';
-    }else if (value < .8) {
-        return '#0021CA';
-    }else if (value < .9) {
-        return '#005CC6';
-    } else {
-        return '#0095C2';
+    var greenStr = green.toString(16);
+    if (greenStr.length == 1) {
+        greenStr = '0' + greenStr;
     }
+    var blueStr = blue.toString(16);
+    if (blueStr.length == 1) {
+        blueStr = '0' + blueStr;
+    }
+    var res =  '#' + redStr + greenStr + blueStr;
+    console.log(res);
+    return res;
 }
 
 window.onload = function() {

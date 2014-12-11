@@ -16,8 +16,12 @@ def _append_data(summary_data, counties):
     miss = 0
     for county in counties:
         fips = county.get('id')
-        if summary_data.get(str(fips)):
-            county['properties'] = summary_data.get(str(fips))
+        str_fips = str(fips)
+        if len(str_fips) < 5:
+            # print 'woops'
+            str_fips = '0' + str_fips
+        if summary_data.get(str_fips):
+            county['properties'] = summary_data.get(str_fips)
             hit += 1
         else:
             # print 'could not find fips {} in our data'.format(fips)
