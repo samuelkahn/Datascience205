@@ -2,10 +2,12 @@
 <meta charset="utf-8">
 <style>
 
+    /*
     path {
       stroke: #0ff;
       stroke-width: .5px;
     }
+    */
 
     path:hover {
       fill: yellow;
@@ -56,16 +58,14 @@ function map_normalized_variable_to_color(value) {
 window.onload = function() {
     var maps = new Maps();
     var gui = new dat.GUI();
-    var yearChangeController = gui.add(maps, 'year', 1990, 2014).step(1);
+    var yearChangeController = gui.add(maps, 'year', 1990, 2014).step(1).listen();
     yearChangeController.onFinishChange(function(val) {
         //console.log(val);
         maps.render();
     });
-    var normalizeController = gui.add(maps, 'normalize');
-    normalizeController.onFinishChange(function(val) {
-        //console.log(val);
-        maps.render();
-    });
+
+    var normalizeController = gui.add(maps, 'loop');
+
     var varChangeController = gui.add(maps, 'variable', ['Weekly Wage', 'Employment Levels', 'Establishment Count', 'Total Wage', 'Population']);
     varChangeController.onFinishChange(function(val) {
         //console.log(val);
@@ -88,7 +88,7 @@ var Maps = function() {
     this.height = 500;
     this.year = 1990;
     this.variable = 'Weekly Wage';
-    this.normalize = false;
+    this.loop = false;
 
     var path = d3.geo.path();
     d3.select("svg").remove();
@@ -114,7 +114,10 @@ var Maps = function() {
         paths = svg.selectAll("path")
             .data(topojson.feature(topology, topology.objects.counties).features)
             .enter().append("path")
-            .attr("d", path);
+            .attr("d", path)
+            .attr("stroke", "#0ff")
+            .attr("stroke-width", "0.5px")
+
         this.render();
     }.bind(this));
 
@@ -122,6 +125,9 @@ var Maps = function() {
         var var_name = changer[this.variable];
         var year_index = this.year - 1990;
         var max = d3.max(counties, function(c) {if (c.properties && c.properties[var_name]) {return parseFloat(c.properties[var_name][year_index])} return 0;});
+
+        paths.selectAll("*").remove();
+
         paths.attr("fill", function(d) {
                 if(d.properties && d.properties[var_name]) {
                     var normal = parseFloat(d.properties[var_name][year_index]) / max;
@@ -143,6 +149,16 @@ var Maps = function() {
                 }
             });
     };
+
+    setInterval(function() {
+        if (this.loop) {
+            this.year += 1;
+            if (this.year > 2014) {
+                this.year = 1990;
+            }
+            this.render();
+        }
+    }.bind(this), 1000)
 }
 
 
