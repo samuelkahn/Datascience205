@@ -3,7 +3,7 @@
 <style>
 
     path {
-      stroke: #fff;
+      stroke: #0ff;
       stroke-width: .5px;
     }
 
@@ -29,11 +29,11 @@ var changer = {
 // value is in [0,1]
 function map_normalized_variable_to_color(value) {
     // todo: make this better
-    console.log(value);
+    //console.log(value);
     var blue = Math.round(Math.max(0, 255 - 2 * value * 255));
     var red = Math.round(Math.max(0, -255 + 2 * value * 255));
     var green = Math.round((255 - blue - red) * .5);
-    console.log(red);
+    //console.log(red);
     var redStr = red.toString(16);
     if (redStr.length == 1) {
         redStr = '0' + redStr;
@@ -47,7 +47,7 @@ function map_normalized_variable_to_color(value) {
         blueStr = '0' + blueStr;
     }
     var res =  '#' + redStr + greenStr + blueStr;
-    console.log(res);
+    //console.log(res);
     return res;
 }
 
@@ -56,20 +56,30 @@ window.onload = function() {
     var gui = new dat.GUI();
     var yearChangeController = gui.add(maps, 'year', 1990, 2014).step(1);
     yearChangeController.onFinishChange(function(val) {
-        console.log(val);
+        //console.log(val);
         maps.render();
     });
     var normalizeController = gui.add(maps, 'normalize');
     normalizeController.onFinishChange(function(val) {
-        console.log(val);
+        //console.log(val);
         maps.render();
     });
     var varChangeController = gui.add(maps, 'variable', ['Weekly Wage', 'Employment Levels', 'Establishment Count', 'Total Wage', 'Population']);
     varChangeController.onFinishChange(function(val) {
-        console.log(val);
+        //console.log(val);
         maps.render();
     });
 };
+
+var zoom = d3.behavior.zoom()
+    .scaleExtent([1, 10])
+    .on("zoom", zoomed);
+
+var svg;
+
+function zoomed() {
+    svg.attr("transform", "translate(" + d3.event.translate + ")scale(" + d3.event.scale + ")");
+}
 
 var Maps = function() {
     this.width = 960;
@@ -81,9 +91,12 @@ var Maps = function() {
     var path = d3.geo.path();
     this.render = function render() {
         d3.select("svg").remove();
-        var svg = d3.select("body").append("svg")
-                .attr("width", this.width)
-                .attr("height", this.height);
+        svg = d3.select("body")
+                .append("svg")
+                    .attr("width", this.width)
+                    .attr("height", this.height)
+                .append("g")
+                    .call(zoom);
 
         var var_name = changer[this.variable];
         var year_index = this.year - 1990;
@@ -95,7 +108,6 @@ var Maps = function() {
                 }
             });
             var max = d3.max(counties, function(c) {if (c.properties && c.properties[var_name]) {return c.properties[var_name][year_index]} return 0;});
-            console.log(max);
 
             svg.selectAll("path")
                 .data(topojson.feature(topology, topology.objects.counties).features)
