@@ -29,7 +29,9 @@ var changer = {
 // value is in [0,1]
 function map_normalized_variable_to_color(value) {
     // todo: make this better
-    //console.log(value);
+    if (value > 1) {
+        //console.log(value);
+    }
     var blue = Math.round(Math.max(0, 255 - 2 * value * 255));
     var red = Math.round(Math.max(0, -255 + 2 * value * 255));
     var green = Math.round((255 - blue - red) * .5);
@@ -89,54 +91,58 @@ var Maps = function() {
     this.normalize = false;
 
     var path = d3.geo.path();
-    this.render = function render() {
-        d3.select("svg").remove();
-        svg = d3.select("body")
-                .append("svg")
-                    .attr("width", this.width)
-                    .attr("height", this.height)
-                .append("g")
-                    .call(zoom);
+    d3.select("svg").remove();
+    svg = d3.select("body")
+            .append("svg")
+                .attr("width", this.width)
+                .attr("height", this.height)
+            .append("g")
+                .call(zoom);
 
+    var paths;
+    var counties;
+    d3.json("output.json", function(error, topology) {
         var var_name = changer[this.variable];
         var year_index = this.year - 1990;
-        d3.json("output.json", function(error, topology) {
-            var counties = topology.objects.counties.geometries;
-            counties.forEach(function(c) {
-                if (c.properties && c.properties[var_name]) {
-                    c.properties[var_name][year_index] = +c.properties[var_name][year_index];
+        counties = topology.objects.counties.geometries;
+        counties.forEach(function(c) {
+            if (c.properties && c.properties[var_name]) {
+                c.properties[var_name][year_index] = +c.properties[var_name][year_index];
+            }
+        });
+
+        paths = svg.selectAll("path")
+            .data(topojson.feature(topology, topology.objects.counties).features)
+            .enter().append("path")
+            .attr("d", path);
+        this.render();
+    }.bind(this));
+
+    this.render = function render() {
+        var var_name = changer[this.variable];
+        var year_index = this.year - 1990;
+        var max = d3.max(counties, function(c) {if (c.properties && c.properties[var_name]) {return parseFloat(c.properties[var_name][year_index])} return 0;});
+        paths.attr("fill", function(d) {
+                if(d.properties && d.properties[var_name]) {
+                    var normal = parseFloat(d.properties[var_name][year_index]) / max;
+                    return map_normalized_variable_to_color(normal);
+                } else {
+                    return '#FFFFFF';
+                }
+            })
+            .append("svg:title")
+            .text(function(d) {
+                if(d.properties && d.properties[var_name]) {
+                    var level = Math.round(d.properties[var_name][year_index]);
+                    return d.properties.name + ': ' + level;
+                }
+                else if(d.properties) {
+                    return d.properties.name;
+                } else {
+                    return 'NA';
                 }
             });
-            var max = d3.max(counties, function(c) {if (c.properties && c.properties[var_name]) {return c.properties[var_name][year_index]} return 0;});
-
-            svg.selectAll("path")
-                .data(topojson.feature(topology, topology.objects.counties).features)
-                .enter().append("path")
-                .attr("d", path)
-                .attr("fill", function(d) {
-                    if(d.properties && d.properties[var_name]) {
-                        //console.log(d.properties.weekly_wage);
-                        var normal = d.properties[var_name][year_index] / max;
-                        return map_normalized_variable_to_color(normal);
-                    } else {
-                        return '#FFFFFF';
-                    }
-                })
-                .append("svg:title")
-                .text(function(d) {
-                    if(d.properties && d.properties[var_name]) {
-                        var level = Math.round(d.properties[var_name][year_index]);
-                        return d.properties.name + ': ' + level;
-                    }
-                    else if(d.properties) {
-                        return d.properties.name;
-                    } else {
-                        return 'NA';
-                    }
-                });
-        });
     };
-    this.render();
 }
 
 
