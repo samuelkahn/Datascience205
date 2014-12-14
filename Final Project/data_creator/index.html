@@ -28,6 +28,28 @@ var changer = {
     'Population': 'population'
 };
 
+// value is in [-1,1]
+function map_change_normalized_to_color(value) {
+    if (isNaN(value)) {
+        console.log(value);
+        value = 0;
+    }
+    if (value < 0) {
+        var redStr = Math.min(Math.round(-255 * value + 50), 255).toString(16);
+        if (redStr.length < 2) {
+            redStr = '0' + redStr;
+        }
+        return '#' + redStr + '0000';
+    } else {
+        var greenStr = Math.min(Math.round(255 * value + 50), 255).toString(16);
+        if (greenStr.length < 2) {
+            greenStr = '0' + greenStr;
+        }
+        return '#00' + greenStr + '00';
+    }
+
+}
+
 // value is in [0,1]
 function map_normalized_variable_to_color(value) {
     // todo: make this better
@@ -64,7 +86,13 @@ window.onload = function() {
         maps.render();
     });
 
-    var normalizeController = gui.add(maps, 'loop');
+    // if this is set we will 'loop' the years
+    var loopController = gui.add(maps, 'loop');
+
+    var changesController = gui.add(maps, 'viewChanges');
+    changesController.onFinishChange(function(val) {
+        maps.render();
+    });
 
     var varChangeController = gui.add(maps, 'variable', ['Weekly Wage', 'Employment Levels', 'Establishment Count', 'Total Wage', 'Population']);
     varChangeController.onFinishChange(function(val) {
@@ -89,6 +117,7 @@ var Maps = function() {
     this.year = 1990;
     this.variable = 'Weekly Wage';
     this.loop = false;
+    this.viewChanges = false;
 
     var path = d3.geo.path();
     d3.select("svg").remove();
@@ -116,36 +145,65 @@ var Maps = function() {
             .enter().append("path")
             .attr("d", path)
             .attr("stroke", "#0ff")
-            .attr("stroke-width", "0.5px")
+            .attr("stroke-width", "0.5px");
 
         this.render();
     }.bind(this));
 
     this.render = function render() {
+        var that = this;
         var var_name = changer[this.variable];
         var year_index = this.year - 1990;
-        var max = d3.max(counties, function(c) {if (c.properties && c.properties[var_name]) {return parseFloat(c.properties[var_name][year_index])} return 0;});
+        var max, min;
+        if (!this.viewChanges) {
+            max = d3.max(counties, function(c) {
+                if (c.properties && c.properties[var_name]) {
+                    return parseFloat(c.properties[var_name][year_index])
+                }
+            });
+            min = d3.min(counties, function(c) {
+                if (c.properties && c.properties[var_name]) {
+                    return parseFloat(c.properties[var_name][year_index])
+                }
+            });
+        }
 
+        // remove any old titles
         paths.selectAll("*").remove();
 
         paths.attr("fill", function(d) {
-                if(d.properties && d.properties[var_name]) {
-                    var normal = parseFloat(d.properties[var_name][year_index]) / max;
+                if(!d.properties || !d.properties[var_name]) {
+                    return '#FFF'; // if the property isn't there, return white
+                }
+                var thisYear = parseFloat(d.properties[var_name][year_index]);
+                if (!that.viewChanges) {
+                    var normal = thisYear / max;
                     return map_normalized_variable_to_color(normal);
                 } else {
-                    return '#FFFFFF';
+                    if (year_index === 0) {
+                        return '#FFF'
+                    } else {
+                        var lastYear = parseFloat(d.properties[var_name][year_index - 1]);
+                        var percentChange = (thisYear - lastYear) / lastYear;
+                        return map_change_normalized_to_color(percentChange);
+                    }
                 }
             })
             .append("svg:title")
             .text(function(d) {
-                if(d.properties && d.properties[var_name]) {
+                if(!d.properties && !d.properties[var_name]) {
+                    return 'NA'; // if the property isn't there, return NA
+                } else if (d.properties && !d.properties[var_name]) {
+                    return d.properties.name; // the name is there, return that
+                }
+                if (!that.viewChanges) {
                     var level = Math.round(d.properties[var_name][year_index]);
                     return d.properties.name + ': ' + level;
-                }
-                else if(d.properties) {
-                    return d.properties.name;
                 } else {
-                    return 'NA';
+                    var thisYear = parseFloat(d.properties[var_name][year_index]);
+                    var lastYear = parseFloat(d.properties[var_name][year_index - 1]);
+                    var percentChange = (thisYear - lastYear) / lastYear;
+                    return d.properties.name + ': ' + Math.round(percentChange * 100) + '%'
                 }
             });
     };
