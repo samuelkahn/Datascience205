@@ -8,7 +8,7 @@
 <body>
 <script src="http://d3js.org/d3.v3.min.js"></script>
 <script src="http://d3js.org/topojson.v1.min.js"></script>
-<script type="text/javascript" src="dat.gui.js"></script>
+<script type="text/javascript" src="static/dat.gui.js"></script>
 <script>
 
 var changer = {
@@ -121,7 +121,7 @@ var Maps = function() {
 
     var paths;
     var counties;
-    d3.json("output.json", function(error, topology) {
+    d3.json("static/output.json", function(error, topology) {
         var var_name = changer[this.variable];
         var year_index = this.year - 1990;
         counties = topology.objects.counties.geometries;
