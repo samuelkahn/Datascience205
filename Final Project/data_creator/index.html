@@ -85,7 +85,7 @@ window.onload = function() {
         maps.render();
     });
 
-    var varChangeController = gui.add(maps, 'variable', ['Weekly Wage', 'Employment Levels', 'Establishment Count', 'Total Wage', 'Population']);
+    var varChangeController = gui.add(maps, 'variable', ['Weekly Wage', 'Employment Levels', 'Establishment Count', 'Total Wage']);
     varChangeController.onFinishChange(function(val) {
         //console.log(val);
         maps.render();
