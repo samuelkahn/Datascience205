@@ -68,9 +68,9 @@ def _combine_names(summary_data):
 def _get_file_names():
     to_look_at = []
 
-    list_of_years = range(1990, 2015)
+    list_of_years = range(1990, 2014)
     for year in list_of_years:
-        to_look_at.append('../{}/{}_mapreduce_aggregate.csv'.format(year, year))
+        to_look_at.append('../mapreduce/{}/{}_mapreduce_aggregate.csv'.format(year, year))
 
     return zip(range(1990, 2015), to_look_at)
 
