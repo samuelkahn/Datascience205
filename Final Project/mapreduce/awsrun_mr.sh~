@@ -1,7 +1,0 @@
-#!/bin/bash
-for i in {1992..2013}
-  do
-     folder=$i".q1-q4.by_industry"
- #    mkdir $i
-     python mr_weeklywage.py -c mrjob.conf -r emr --emr-job-flow-id=j-1WRO6X9MSGBQT  s3://mhayes/$folder/*csv > $i/$i"_weeklywage.txt"     
-done
